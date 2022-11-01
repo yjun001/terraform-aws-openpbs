@@ -1,7 +1,7 @@
 # AWS HPC EC2 Instance OpenPBS cluster - created by **terraform**
 
-Create three HPC nodes (OpenPBS) cluster by using aws EC2 instances and [terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs), base on this [hosts file](https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f0d34767730d49/hosts.ini)
-https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f0d34767730d49/hosts.ini#L1-L14
+Create three HPC nodes (OpenPBS) cluster by using aws EC2 instances and [terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs), base on this [hosts file](https://github.com/yjun-001/terraform-aws-openpbs/blob/eb9eb761229cade3f88a9ec3ab9bee57e85c3eed/ansible/inventory/hosts.ini)
+https://github.com/yjun-001/terraform-aws-openpbs/blob/eb9eb761229cade3f88a9ec3ab9bee57e85c3eed/ansible/inventory/hosts.ini#L1-L14
 
 
 ### Prerequisite Package and its environment Setup (Windows 10 Desktop)
@@ -22,7 +22,7 @@ https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f
     - **terraform destroy**
 
 ### repository entities relationship created by terraform graph
-![Alt text](https://github.com/yjun-001/multi-aws-instances/blob/9a1c8a2e89a58682e8a4a92945c680accbe440eb/image/graphviz.svg)
+![Alt text](https://github.com/yjun-001/terraform-aws-openpbs/blob/eb9eb761229cade3f88a9ec3ab9bee57e85c3eed/image/graphviz.svg)
 
 ### This repository will do 
 - create an AWS VPC with cidr_block = **"10.0.0.0/16"**
