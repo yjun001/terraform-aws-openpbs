@@ -1,0 +1,6 @@
+---
+- import_playbook: admin_user_add.yaml
+- import_playbook: hostsfile_update.yaml
+- import_playbook: sshkey_exchange.yaml
+- import_playbook: known_hosts_update.yaml
+- import_playbook: openpbs_install.yaml

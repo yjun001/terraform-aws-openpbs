@@ -1,0 +1,104 @@
+---
+- name: install pbs on nodes
+  gather_facts: no
+  hosts: nodes
+  tasks:
+    - name: install prerequisite packages
+      become: true
+      become_user: root
+      apt:
+        state: present
+        update_cache: yes
+        name:
+          - libhwloc15 
+          - libpq5 
+          - libtk8.6
+    - name: install pbs packages
+      become: true
+      become_user: pbsadmin
+      shell: >
+        scp master:/home/ubuntu/ansible/openpbs/openpbs_22.05.11.ubuntu_20.04/openpbs-execution_22.05.11-1_amd64.deb /tmp/. &&
+        sudo dpkg -i /tmp/openpbs-execution_22.05.11-1_amd64.deb
+    - name: update pbs.conf
+      become: yes
+      become_user: root
+      tags: update_node_pbs_conf
+      lineinfile:
+        path: /etc/pbs.conf
+        regexp: 'PBS_SERVER=CHANGE_THIS_TO_PBS_SERVER_HOSTNAME'
+        line: 'PBS_SERVER=master'
+        state: present
+        backup: yes
+      register: node_pbs_conf
+      #notify: nodes_restart_pbs
+  handlers:
+    - name: nodes_restart_pbs
+      become: true
+      become_user: root
+      service:
+        name: pbs
+        state: restarted
+      when: node_pbs_conf.changed
+
+- name: install pbs on head
+  gather_facts: no
+  hosts: head
+  tasks:
+    - name: install openbps prerequisite packages
+      become: true
+      become_user: root
+      apt:
+        name:
+          - expat
+          - postgresql
+          - postgresql-contrib 
+          - sendmail-bin 
+          - tcl
+          - tk
+          - libical3
+          - libhwloc15 
+          - libpq5 
+          - libtk8.6
+        state: latest
+        update_cache: yes
+    - name: install pbs packages
+      become: true
+      become_user: root
+      shell:
+        dpkg -i /home/ubuntu/ansible/openpbs/openpbs_22.05.11.ubuntu_20.04/openpbs-server_22.05.11-1_amd64.deb
+    - name: update /etc/hosts
+      # fix the issue of duplicated hostname
+      become: yes
+      become_user: root
+      tags: update_head_pbs_conf
+      lineinfile:
+        path: /etc/hosts
+        regexp: '127.0.2.1 master master'
+        line: '127.0.2.1 master-vg master-vg'
+        state: present
+        backup: yes
+      register: head_pbs_conf
+    - name: first round restart OpenPBS service
+      become: true
+      become_user: root
+      service:
+        name: pbs
+        state: restarted
+      when: head_pbs_conf.changed
+    - name: add nodes to cluster complex
+      become: true
+      become_user: root
+      shell: |
+        /opt/pbs/bin/qmgr -c "create node node1"
+        /opt/pbs/bin/qmgr -c "create node node2"
+        /opt/pbs/bin/qmgr -c "set server flatuid=true"
+        /opt/pbs/bin/qmgr -c "set server acl_roots+=pbsadmin@*"
+        /opt/pbs/bin/qmgr -c "set server operators+=pbsadmin@*"
+      notify: head_restart_pbs
+  handlers:
+    - name: head_restart_pbs
+      become: true
+      become_user: root
+      service:
+        name: pbs
+        state: restarted

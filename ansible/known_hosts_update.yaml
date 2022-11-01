@@ -1,0 +1,27 @@
+- name: Store known hosts of 'all' the hosts in the inventory file
+  become: yes
+  become_user: pbsadmin
+  become_method: sudo 
+  become_flags: "-i"
+  hosts: all
+
+  vars:
+    ssh_known_hosts_file: "{{ ansible_env.HOME + '/.ssh/known_hosts' }}"
+    ssh_known_hosts: "{{ groups['all'] }}"
+
+  tasks:
+  
+  - name: For each host, scan for its ssh public key
+    shell: "ssh-keyscan {{ item }},`dig +short {{ item }}`"
+    #when: item != ansible_hostname
+    with_items: "{{ ssh_known_hosts }}"
+    register: ssh_known_host_results
+    ignore_errors: yes
+  
+  - name: Add/update the public key in the '{{ ssh_known_hosts_file }}'
+    known_hosts:
+      name: "{{ item.item }}"
+      key: "{{ item.stdout }}"
+      path: "{{ ssh_known_hosts_file }}"
+    when: item != ansible_hostname
+    with_items: "{{ ssh_known_host_results.results }}"
