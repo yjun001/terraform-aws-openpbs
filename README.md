@@ -1,6 +1,6 @@
-# AWS HPC EC2 cluster instances - create by **terraform**
+# AWS HPC EC2 Instance OpenPBS cluster - created by **terraform**
 
-Create three aws HPC EC2 cluster instances by using [terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs), base on this [hosts file](https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f0d34767730d49/hosts.ini)
+Create three HPC nodes (OpenPBS) cluster by using aws EC2 instances and [terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs), base on this [hosts file](https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f0d34767730d49/hosts.ini)
 https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f0d34767730d49/hosts.ini#L1-L14
 
 
@@ -26,13 +26,17 @@ https://github.com/yjun-001/multi-aws-instances/blob/f5afca22f5b18cb27f1be86189f
 
 ### This repository will do 
 - create an AWS VPC with cidr_block = **"10.0.0.0/16"**
-- create an AWS Public subnet with cidr_block = **10.0.1.0/24"** # 254 IP addresses available in this subnet
+- create an AWS Public subnet with cidr_block = **10.0.0.0/24"** # 254 IP addresses available in this subnet
 - create an AWS Internat Gateway(IG) and route table (RT)
 - create an AWS Security Group (SG), and allow ssh incoming traffic at port 22
 - create a three-nodes of EC2 cluster instances, 
   - assign each instances a static private IP. which defined in hosts file above. this IP address is to use as the primary address of private subnet, instead of the default assigned DHCP address, [DHCP Issues](https://stackoverflow.com/questions/42666396/terraform-correctly-assigning-a-static-private-ip-to-newly-created-instance)
   - setup each hostname as well according to hosts file.
   - update private ssh key in master node instance, so it can ssh other nodes without password
+- **Install OpenPBS binary(preload at ansible/openpbs/) on each EC2 instance**
+  - **nodes**: install/setup MOM (openpbs-execution_22.05.11-1_amd64.deb)
+  - **head**: install/setup server/sched/comm daemons (openpbs-server_22.05.11-1_amd64.deb)
+  - run test queue jobs - find_prime.sh (see below in action section)
 
 ### Code In Action and its output:
 #### **terraform apply:**
@@ -211,6 +215,6 @@ Destroy complete! Resources: 18 destroyed.
 
 
 ### referene:
-[VPC with public and private subnets (NAT)](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html)
-[Attach IAM role to AWS EC2 instance using Terraform](https://skundunotes.com/2021/11/16/attach-iam-role-to-aws-ec2-instance-using-terraform/)
-[Terraform and Ansible](https://www.bitslovers.com/terraform-and-ansible/)
+- [VPC with public and private subnets (NAT)](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html)
+- [Attach IAM role to AWS EC2 instance using Terraform](https://skundunotes.com/2021/11/16/attach-iam-role-to-aws-ec2-instance-using-terraform/)
+- [Terraform and Ansible](https://www.bitslovers.com/terraform-and-ansible/)
