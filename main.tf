@@ -1,5 +1,5 @@
 provider "aws" {
-  profile = "default"
+  # profile = "default"  # fix aws v3 cli vs v4 behaivor
   region  = "us-east-2"
 }
 
