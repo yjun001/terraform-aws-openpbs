@@ -1,10 +1,10 @@
 terraform {
-    backend "remote" {
-        hostname = "app.terraform.io"
-        organization = "terraform-org-cloud"
-    }
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "terraform-org-cloud"
 
     workspaces {
-        name = "terraform-aws-openpbs"
+      name = "terraform-aws-openpbs"
     }
+  }
 }
